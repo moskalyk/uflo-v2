@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.footer {
+  position: fixed;
+  bottom: 25px;
+  text-align: center;
+  width: 100%;
+}
+
+.menu {
+  cursor: pointer;
+}
+
+.single-key {
+  cursor: pointer;
+}

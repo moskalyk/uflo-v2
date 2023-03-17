@@ -6,10 +6,26 @@ import { Col, Row, Container } from "react-bootstrap";
 
 import { sequence } from '0xsequence'
 
+import { controls, evalScope } from '@strudel.cycles/core';
+import { CodeMirror, useHighlighting, useKeydown, useStrudel, flash } from '@strudel.cycles/react';
+import { getAudioContext, initAudioOnFirstClick, panic, webaudioOutput } from '@strudel.cycles/webaudio';
+
 let count = 0
 let overlap = 0.5
 let amp = 20;
 let loggedIn = true
+
+initAudioOnFirstClick();
+
+evalScope(
+  controls,
+  import('@strudel.cycles/core'),
+  import('@strudel.cycles/tonal'),
+  import('@strudel.cycles/mini'),
+  import('@strudel.cycles/xen'),
+  import('@strudel.cycles/webaudio'),
+  import('@strudel.cycles/osc'),
+);
 
 const Home = (props: any) => {
 
@@ -110,15 +126,56 @@ const List = (props: any) => {
   )
 }
 
+const defaultTune = `samples({
+  bd: ['bd/BT0AADA.wav','bd/BT0AAD0.wav','bd/BT0A0DA.wav','bd/BT0A0D3.wav','bd/BT0A0D0.wav','bd/BT0A0A7.wav'],
+  sd: ['sd/rytm-01-classic.wav','sd/rytm-00-hard.wav'],
+  hh: ['hh27/000_hh27closedhh.wav','hh/000_hh3closedhh.wav'],
+}, 'github:tidalcycles/Dirt-Samples/master/');
+stack(
+  s("bd,[~ <sd!3 sd(3,4,2)>],hh*8") // drums
+  .speed(perlin.range(.7,.9)) // random sample speed variation
+  //.hush()
+  ,"<a1 b1*2 a1(3,8) e2>" // bassline
+  .off(1/8,x=>x.add(12).degradeBy(.5)) // random octave jumps
+  .add(perlin.range(0,.5)) // random pitch variation
+  .superimpose(add(.05)) // add second, slightly detuned voice
+  .n() // wrap in "n"
+  .decay(.15).sustain(0) // make each note of equal length
+)
+.fast(2/3)`;
+
+const ctx = getAudioContext();
+const getTime = () => ctx.currentTime;
+
 const Record = () => {
+  const [code, setCode] = useState(defaultTune);
+  const [view, setView] = useState();
+
+  const { scheduler, evaluate, schedulerError, evalError, isDirty, activeCode, pattern, started } = useStrudel({
+    code,
+    defaultOutput: webaudioOutput,
+    getTime,
+  });
+
+  useHighlighting({
+    view,
+    pattern,
+    active: started && !activeCode?.includes('strudel disable-highlighting'),
+    getTime: () => scheduler.now(),
+  });
+
   return(
   <>
-    <div className='footer-record'>
-
-      <input className='single-title' placeholder='Name of Single'></input>
-      <input type="checkbox" id="switch" /><label htmlFor="switch">Toggle</label>
+    <div className='code'>
+      <CodeMirror value={code} onChange={setCode} onViewChanged={setView} />
     </div>
-  
+    <div className='footer-record'>
+      <input className='single-title' placeholder='Name of Single'></input>
+      <input type="checkbox" id="switch" onClick={async () => {
+        await evaluate(code);
+        scheduler.start();
+      }}/><label htmlFor="switch">Toggle</label>
+    </div>
   </>
   )
 }

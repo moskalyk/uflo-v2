@@ -1,0 +1,106 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.footer {
+  position: fixed;
+  bottom: 25px;
+  text-align: center;
+  width: 100%;
+}
+
+.menu {
+  cursor: pointer;
+}
+
+.single-key {
+  cursor: pointer;
+}
+
+.single-title {
+  padding: 10px;
+}
+input[type=checkbox]{
+	height: 0;
+	width: 0;
+	visibility: hidden;
+  margin: 20px;
+}
+
+label {
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 90px;
+	height: 45px;
+	background: grey;
+	display: block;
+	border-radius: 45px;
+	position: relative;
+  top: -10px;
+}
+
+label:after {
+	content: '';
+	position: absolute;
+	top: 2.5px;
+	left: 2.5px;
+	width: 40px;
+	height: 40px;
+	background: #fff;
+	border-radius: 40px;
+	transition: 0.3s;
+}
+
+input:checked + label {
+	background: #bada55;
+}
+
+input:checked + label:after {
+	left: calc(100% - 5px);
+	transform: translateX(-100%);
+}
+
+label:active:after {
+	width: 130px;
+}
+
+.footer-record {
+  position: fixed;
+  bottom: 20px;
+  left: 40%;
+}
